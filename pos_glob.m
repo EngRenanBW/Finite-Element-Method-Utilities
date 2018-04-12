@@ -35,7 +35,7 @@ function mtr_out=pos_glob(mtr,fileiras_iniciais,fileiras_meio,fileiras_totais,re
   
   %%{
   if(nargin==4)
-    mtr
+    %mtr
     %clipboard(mtr)
     fileiras_totais=2+fileiras_iniciais+fileiras_meio+fileiras_finais;
     mtr=pos_glob(mtr',fileiras_iniciais,fileiras_meio,fileiras_totais,"repetir");

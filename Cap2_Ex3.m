@@ -1,19 +1,16 @@
 %Created by Engineer Renan Bueno W. (https://github.com/EngRenanBW/)
-%Exemplo moaveni pag 124
 
 more off
 clc
 clear
+disp("Exercicio 3 cap 2 Moaveni")
 
-
-E=1.90E6 %lbf/in^2
-AREA=ones(1,6)*8; %in^2
-angulo=[0,90+(atan(3/3))*180/pi,0,-90,(atan(3/3))*180/pi,0]
-L=[3,sqrt(3^2+3^2),3,3,sqrt(3^2+3^2),3]*12 %in
-nos_conectados={[1,2],[2,3],[3,4],[2,4],[2,5],[4,5]}
+E=10E6 %lbf/in^2
+AREA=ones(1,2)*2.3; %in^2
+angulo=[60,120]
+L=[3,3]*12 %convertendo ft para in
+nos_conectados={[1,2],[2,3]}
 posicoes_imoveis=[1,2,5,6] %como e em 2 dimensoes: 1 significa no1 nao move em X; 2 significa no1 nao move em Y; 3 significa no2 nao move em X; 4 significa no2 nao move em Y
-%matriz de forcas
-F=[0;0;0;0;0;0;0;-500;0;-500] %N
 
 %recuperando informacoes necessarias
 n_ele=size(L,2) %numero de elementos
@@ -44,11 +41,14 @@ K_ELEM_GLOB=K_ELEM_GLOB
 %matriz de rigidez global
 K_GLOB=sum_mtr(K_ELEM_GLOB)
 
+%matriz de forcas
+F=[0;0;0;-200;0;0]
+
 %retirando posicoes dos nos pinados
 K_GLOB_calc=retirar_posicao(K_GLOB,posicoes_imoveis)
 F_calc=retirar_posicao(F,posicoes_imoveis)
 
-%descobrindo a matriz de DEFORMACAO F=K*X
+%descobrindo a matriz de deslocamento F=K*X
 X_calc=inv(K_GLOB_calc)*F_calc
 %recolocando os valores iguais a zero
 X=zeros(n_nos*dimensoes,1);
@@ -60,32 +60,24 @@ X
 
 %Fase de posprocessamento
 %calculando o stress
-%size(k,2)
-%disp("DEFORMACAO")
+size(k,2)
+disp("deslocamento")
 for(item=[1:size(k,2)])
   
   %2*nos_conectados{item}(1)
-  %2*nos_conectados{item}(2)
-  DEFORMACAO_x(item)=abs(X(2*nos_conectados{item}(1)-1)-X(2*nos_conectados{item}(2)-1));
-  DEFORMACAO_y(item)=abs(X(2*nos_conectados{item}(1))-X(2*nos_conectados{item}(2)));
+  2*nos_conectados{item}(2)
+  DESLOCAMENTO_x(item)=abs(X(2*nos_conectados{item}(1)-1)-X(2*nos_conectados{item}(2)-1));
+  DESLOCAMENTO_y(item)=abs(X(2*nos_conectados{item}(1))-X(2*nos_conectados{item}(2)));
   
-  DEFORMACAO(item)=sqrt(DEFORMACAO_x(item)^2+DEFORMACAO_y(item)^2);
-  FORCA_ELEMENTO_x(item)=k(item)*DEFORMACAO_x(item);
-  FORCA_ELEMENTO_y(item)=k(item)*DEFORMACAO_y(item);
-  FORCA_ELEMENTO(item)=k(item)*DEFORMACAO(item);
+  DESLOCAMENTO(item)=sqrt(DESLOCAMENTO_x(item)^2+DESLOCAMENTO_y(item)^2)
+  FORCA_ELEMENTO(item)=k(item)*DESLOCAMENTO(item);
   TENSAO(item)=FORCA_ELEMENTO(item)/AREA(item);
 endfor
 
-%DEFORMACAO_x
-%DEFORMACAO_y
-%FORCA_ELEMENTO_x
-%FORCA_ELEMENTO_y
+DESLOCAMENTO=DESLOCAMENTO
+FORCA_ELEMENTO=FORCA_ELEMENTO
+TENSAO=TENSAO
 
 REACAO=round(K_GLOB*X-F)
 
-%DEFORMACAO=DEFORMACAO
-%FORCA_ELEMENTO=FORCA_ELEMENTO
-%TENSAO=TENSAO
-
-
-
+disp("Como visto na matriz de reacao o somatorio das forcar em Y e igual a forca aplicada e o somatorio das em X e zero");
