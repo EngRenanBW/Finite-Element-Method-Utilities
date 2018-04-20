@@ -2,4 +2,4 @@
 
 function mtr=mmt(val)
   mtr=[val,-val;-val,val];
-endfunction
+%endfunction
