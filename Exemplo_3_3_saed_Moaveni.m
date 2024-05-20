@@ -63,26 +63,21 @@ X
 %size(k,2)
 %disp("DEFORMACAO")
 for(item=[1:size(k,2)])
-  
-  %2*nos_conectados{item}(1)
-  %2*nos_conectados{item}(2)
-  DEFORMACAO_x(item)=abs(X(2*nos_conectados{item}(1)-1)-X(2*nos_conectados{item}(2)-1));
-  DEFORMACAO_y(item)=abs(X(2*nos_conectados{item}(1))-X(2*nos_conectados{item}(2)));
-  
-  DEFORMACAO(item)=sqrt(DEFORMACAO_x(item)^2+DEFORMACAO_y(item)^2);
-  FORCA_ELEMENTO_x(item)=k(item)*DEFORMACAO_x(item);
-  FORCA_ELEMENTO_y(item)=k(item)*DEFORMACAO_y(item);
-  FORCA_ELEMENTO(item)=k(item)*DEFORMACAO(item);
-  TENSAO(item)=FORCA_ELEMENTO(item)/AREA(item);
+  DEFORMACAO_LOCAL_ELEMENTO{item} = [cos(angulo(item)*pi/180),sin(angulo(item)*pi/180),0,0;-sin(angulo(item)*pi/180),cos(angulo(item)*pi/180),0,0;0,0,cos(angulo(item)*pi/180),sin(angulo(item)*pi/180);0,0,-sin(angulo(item)*pi/180),cos(angulo(item)*pi/180)] * X([nos_conectados(item){1}(1)*2-1,nos_conectados(item){1}(1)*2,nos_conectados(item){1}(2)*2-1,nos_conectados(item){1}(2)*2]); %Matriz pag 134
+  TENSAO{item} = -E*(DEFORMACAO_LOCAL_ELEMENTO{item}(1)-DEFORMACAO_LOCAL_ELEMENTO{item}(3))/L(item); %Equação 3.18
+  FORCA_X_LOCAL_ELEMENTO_NO_i{item} = k(item) * (DEFORMACAO_LOCAL_ELEMENTO{item}(1) - DEFORMACAO_LOCAL_ELEMENTO{item}(3)); %Equação 3.17
+  FORCA_X_LOCAL_ELEMENTO_NO_j{item} = k(item) * (DEFORMACAO_LOCAL_ELEMENTO{item}(3) - DEFORMACAO_LOCAL_ELEMENTO{item}(1)); %Equação 3.17
+
+  DEFORMACAO_x_GLOBAL(item)=abs(X(2*nos_conectados{item}(1)-1)-X(2*nos_conectados{item}(2)-1));
+  DEFORMACAO_y_GLOBAL(item)=abs(X(2*nos_conectados{item}(1))-X(2*nos_conectados{item}(2)));
+
 endfor
 
-%DEFORMACAO_x
-%DEFORMACAO_y
-%FORCA_ELEMENTO_x
-%FORCA_ELEMENTO_y
+DEFORMACAO_x_GLOBAL
+DEFORMACAO_y_GLOBAL
 
-DEFORMACAO=DEFORMACAO
-FORCA_ELEMENTO=FORCA_ELEMENTO
+%DEFORMACAO=DEFORMACAO
+%FORCA_ELEMENTO=FORCA_ELEMENTO
 TENSAO=TENSAO
 
 REACAO=round(K_GLOB*X-F)
